@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myisoapp
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: myisoapp
+  template:
+    metadata:
+      labels:
+        app: myisoapp
+    spec:
+      containers:
+      - name: myisoapp
+        image: nginx
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myisoapp-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: myisoapp
+  ports:
+  - port: 80
+    targetPort: 80

@@ -1,0 +1,53 @@
+############################################
+# Terraform & Provider
+############################################
+
+terraform {
+  required_version = ">= 1.5.0"
+
+  backend "azurerm" {}
+}
+
+provider "azurerm" {
+  features {}
+}
+
+############################################
+# ACR Module
+############################################
+
+module "acr" {
+  source = "./modules/acr"
+
+  rg_name = var.rg_name
+  prefix  = var.prefix
+}
+
+############################################
+# AKS Module
+############################################
+
+module "aks" {
+  source = "./modules/aks"
+
+  rg_name            = var.rg_name
+  location           = var.location
+  prefix             = var.prefix
+  environment        = var.environment
+  owner              = var.owner
+  aks_cluster_name   = var.aks_cluster_name
+  aks_node_size      = var.aks_node_size
+  aks_node_count     = var.aks_node_count
+  kubernetes_version = var.kubernetes_version
+}
+
+############################################
+# Monitoring Module
+############################################
+
+module "monitoring" {
+  source = "./modules/monitoring"
+
+  rg_name = var.rg_name
+}
+
