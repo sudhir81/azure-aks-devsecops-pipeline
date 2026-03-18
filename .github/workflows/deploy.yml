@@ -3,6 +3,8 @@ name: CI-CD to AKS
 on:
   push:
     branches:
+      - dev
+      - preprod
       - main
 
 env:
@@ -12,30 +14,109 @@ env:
   CLUSTER_NAME: DevopsAKSCluster
 
 jobs:
-  build-deploy:
+  build:
+    runs-on: ubuntu-latest
+
+    outputs:
+      image_tag: ${{ steps.vars.outputs.image_tag }}
+      deploy_file: ${{ steps.vars.outputs.deploy_file }}
+      namespace: ${{ steps.vars.outputs.namespace }}
+      environment_name: ${{ steps.vars.outputs.environment_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set deployment variables
+        id: vars
+        run: |
+          IMAGE_TAG=${GITHUB_SHA}
+
+          if [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
+            DEPLOY_FILE="k8s/deployment-dev.yaml"
+            NAMESPACE="dev"
+            ENV_NAME="dev"
+          elif [[ "${GITHUB_REF_NAME}" == "preprod" ]]; then
+            DEPLOY_FILE="k8s/deployment-preprod.yaml"
+            NAMESPACE="preprod"
+            ENV_NAME="preprod"
+          elif [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            DEPLOY_FILE="k8s/deployment-prod.yaml"
+            NAMESPACE="prod"
+            ENV_NAME="prod"
+          else
+            echo "Unsupported branch"
+            exit 1
+          fi
+
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "deploy_file=$DEPLOY_FILE" >> $GITHUB_OUTPUT
+          echo "namespace=$NAMESPACE" >> $GITHUB_OUTPUT
+          echo "environment_name=$ENV_NAME" >> $GITHUB_OUTPUT
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        run: az acr login --name $ACR_NAME
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ steps.vars.outputs.image_tag }} ./sample-app
+          docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ steps.vars.outputs.image_tag }}
+
+  deploy-dev-preprod:
+    if: github.ref_name == 'dev' || github.ref_name == 'preprod'
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Get AKS Credentials
+        run: az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --overwrite-existing
 
-    - name: Login to ACR
-      run: az acr login --name $ACR_NAME
+      - name: Update manifest image
+        run: |
+          sed -i "s|image: .*|image: $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ needs.build.outputs.image_tag }}|g" ${{ needs.build.outputs.deploy_file }}
 
-    - name: Build and Push Docker Image
-      run: |
-        docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }} ./sample-app 
-        docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f ${{ needs.build.outputs.deploy_file }}
+          kubectl rollout status deployment/myisoapp -n ${{ needs.build.outputs.namespace }}
 
-    - name: Get AKS Credentials
-      run: az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --overwrite-existing
+  deploy-prod:
+    if: github.ref_name == 'main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: prod
 
-    - name: Deploy to AKS
-      run: |
-        kubectl set image deployment/myisoapp myisoapp=$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get AKS Credentials
+        run: az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --overwrite-existing
+
+      - name: Update manifest image
+        run: |
+          sed -i "s|image: .*|image: $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ needs.build.outputs.image_tag }}|g" ${{ needs.build.outputs.deploy_file }}
+
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f ${{ needs.build.outputs.deploy_file }}
+          kubectl rollout status deployment/myisoapp -n prod
