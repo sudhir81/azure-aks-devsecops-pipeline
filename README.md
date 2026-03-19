@@ -31,23 +31,25 @@ It includes:
 
 The goal of this project is to simulate how modern organizations deploy applications safely across **dev**, **preprod**, and **prod**.
 
----
+---Important:
+if GitHub breaks because of nested triple backticks while you paste into chat or editor, use this exact version in the file:
 
+```md
 ## 🧭 Architecture Flow
 
+    Developer Push
+        │
+        ├── dev branch
+        │   └── Deploy to dev namespace
+        │
+        ├── preprod branch
+        │   └── Deploy to preprod namespace
+        │
+        └── main branch
+            └── Manual approval required
+                └── Deploy to prod namespace
 ```
-Developer Push
-    │
-    ├── dev branch
-    │      └── Deploy to dev namespace
-    │
-    ├── preprod branch
-    │      └── Deploy to preprod namespace
-    │
-    └── main branch
-           └── Wait for manual approval
-                  └── Deploy to prod namespace
-```
+
 ## ⚙️ Tech Stack
 
 | Layer | Technology |
@@ -62,15 +64,14 @@ Developer Push
 | Environments | dev, preprod, prod |
 | Health Checks | Liveness Probe, Readiness Probe |
 | Security Control | GitHub Environment Approval Gate |
+
 ## 🌍 Environment Mapping
 
-
-| **Git Branch** | **Kubernetes Namespace** | **Deployment Target** |
+| Git Branch | Kubernetes Namespace | Deployment Target |
 |---|---|---|
 | `dev` | `dev` | Development |
 | `preprod` | `preprod` | Pre-Production |
 | `main` | `prod` | Production |
-
 
 🔄 CI/CD Workflow Logic
 
