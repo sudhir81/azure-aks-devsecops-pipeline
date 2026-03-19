@@ -1,176 +1,168 @@
-Enterprise AKS DevSecOps Platform
+# 🚀 Azure AKS DevSecOps Pipeline
 
-A hands-on Azure DevSecOps project that provisions AKS infrastructure with Terraform, builds and pushes container images to Azure Container Registry (ACR), and deploys workloads to Kubernetes using GitHub Actions with branch-based environment promotion.
+<h3 align="center">⚡ Enterprise-Style Branch-Based CI/CD on Azure with Terraform, ACR, AKS, GitHub Actions, and Production Approval Gates</h3>
 
-Project overview
+<p align="center">
+  <img src="https://img.shields.io/badge/Azure-Cloud-blue?style=for-the-badge&logo=microsoftazure&logoColor=white" />
+  <img src="https://img.shields.io/badge/AKS-Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white" />
+  <img src="https://img.shields.io/badge/ACR-Docker%20Registry-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/GitHub-Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" />
+  <img src="https://img.shields.io/badge/Terraform-IaC-7B42BC?style=for-the-badge&logo=terraform&logoColor=white" />
+  <img src="https://img.shields.io/badge/DevSecOps-Enterprise-success?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Production-Approval%20Gate-critical?style=for-the-badge" />
+</p>
 
-This project demonstrates an end-to-end AKS delivery flow:
-	•	Infrastructure as Code with Terraform
-	•	Container image build and push to Azure Container Registry
-	•	Kubernetes deployments to AKS
-	•	Branch-based CI/CD using GitHub Actions
-	•	Environment separation for dev, preprod, and prod
-	•	Production approval gate using GitHub Environments
-	•	Health checks with readiness and liveness probes
-	•	Policy as code structure using OPA policies
+---
 
-Architecture
+## 🌌 Overview
 
+This project showcases a **branch-based Azure AKS DevSecOps pipeline** built with an enterprise mindset.
+
+It includes:
+
+- 🏗️ **Terraform** for infrastructure provisioning
+- 🐳 **Docker** for containerization
+- 📦 **Azure Container Registry (ACR)** for image storage
+- ☸️ **Azure Kubernetes Service (AKS)** for orchestration
+- 🔄 **GitHub Actions** for CI/CD automation
+- 🧪 **Environment-based deployments** using namespaces
+- 🔐 **Manual approval gate for production**
+- ❤️ **Readiness and liveness probes** for application health
+
+The goal of this project is to simulate how modern organizations deploy applications safely across **dev**, **preprod**, and **prod**.
+
+---
+
+## 🧭 Architecture Flow
+
+```
 Developer Push
-   |
-   +--> dev branch ------> GitHub Actions ------> Build Docker image ------> Push to ACR ------> Deploy to dev namespace
-   |
-   +--> preprod branch --> GitHub Actions ------> Build Docker image ------> Push to ACR ------> Deploy to preprod namespace
-   |
-   +--> main branch -----> GitHub Actions ------> Build Docker image ------> Push to ACR ------> Approval Gate ------> Deploy to prod namespace
+    │
+    ├── dev branch
+    │      └── Deploy to dev namespace
+    │
+    ├── preprod branch
+    │      └── Deploy to preprod namespace
+    │
+    └── main branch
+           └── Wait for manual approval
+                  └── Deploy to prod namespace
+```
+## ⚙️ Tech Stack
 
-Terraform --> Azure Resource Group / ACR / AKS / Monitoring foundation
+| **Layer** | **Technology** |
+|---|---|
+| **Cloud** | Microsoft Azure |
+| **IaC** | Terraform |
+| **Containerization** | Docker |
+| **Registry** | Azure Container Registry (ACR) |
+| **Orchestration** | Azure Kubernetes Service (AKS) |
+| **CI/CD** | GitHub Actions |
+| **Deployment Strategy** | Branch-based deployment |
+| **Environments** | dev, preprod, prod |
+| **Health Checks** | Liveness Probe, Readiness Probe |
+| **Security Control** | GitHub Environment Approval Gate |
 
-Repository structure
+## 🌍 Environment Mapping
 
-.
-├── .github/workflows/        # GitHub Actions workflow
-├── environments/            # Backend or environment-related configs
-├── k8s/                     # Kubernetes manifests by environment
+| **Git Branch** | **Kubernetes Namespace** | **Deployment Target** |
+|---|---|---|
+| `dev` | `dev` | Development |
+| `preprod` | `preprod` | Pre-Production |
+| `main` | `prod` | Production |
+
+
+🔄 CI/CD Workflow Logic
+
+✅ Build Stage
+
+When code is pushed to dev, preprod, or main:
+	•	Source code is checked out
+	•	Azure login is performed
+	•	Docker image is built
+	•	Image is tagged with the Git commit SHA
+	•	Image is pushed to ACR
+
+✅ Deploy Stage
+
+Based on the branch:
+	•	dev → deploys to dev namespace
+	•	preprod → deploys to preprod namespace
+	•	main → deploys to prod namespace only after manual approval
+
+⸻
+
+🔐 Production Approval Gate
+
+Production deployment is protected using GitHub Environments.
+
+Before deployment to prod:
+	•	Workflow waits for approval
+	•	Reviewer manually approves deployment
+	•	Only then deployment continues to production
+
+This simulates a real enterprise release control process.
+
+```
+Azure-aks-devsecops-pipeline/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+├── k8s/
 │   ├── deployment-dev.yaml
 │   ├── deployment-preprod.yaml
 │   └── deployment-prod.yaml
-├── modules/                 # Terraform modules
+├── modules/
 │   ├── acr/
 │   ├── aks/
 │   └── monitoring/
-├── policies/opa/            # OPA policy files
-├── sample-app/              # Containerized sample application
-├── backend.tf               # Terraform backend config
-├── main.tf                  # Root Terraform configuration
-└── variables.tf             # Terraform variables
+├── policies/
+│   └── opa/
+├── sample-app/
+├── environments/
+├── backend.tf
+├── main.tf
+├── variables.tf
+└── README.md
+```
+☸️ Kubernetes Highlights
 
-CI/CD workflow
+This project uses separate Kubernetes manifests for each environment.
 
-The GitHub Actions pipeline is branch-aware:
+Key features included:
+	•	Namespace-based environment isolation
+	•	Service exposure using Kubernetes Service
+	•	Liveness probe for container health validation
+	•	Readiness probe for traffic readiness
+	•	Branch-specific deployment manifests
 
-Branch	Target environment	Kubernetes namespace	Approval required
-dev	Dev	dev	No
-preprod	Preprod	preprod	No
-main	Prod	prod	Yes
+⸻
 
-Pipeline flow
-	1.	Checkout repository
-	2.	Detect branch and set deployment variables
-	3.	Login to Azure
-	4.	Login to ACR
-	5.	Build Docker image
-	6.	Push image to ACR
-	7.	Get AKS credentials
-	8.	Update Kubernetes manifest with the new image tag
-	9.	Deploy to the matching namespace
-	10.	For main, wait for manual approval before production deployment
+❤️ Health Checks Implemented
 
-Kubernetes deployment design
+Health checks are extremely important in AKS and interviews.
 
-Each environment has a dedicated manifest under k8s/.
+Liveness Probe
 
-The deployment includes:
-	•	environment-specific namespace targeting
-	•	container image from ACR
-	•	readiness probe
-	•	liveness probe
-	•	service exposure for testing
+Checks whether the container is alive.
+If it fails repeatedly, Kubernetes restarts the container.
 
-Typical deployment characteristics:
-	•	Dev: fast testing and validation
-	•	Preprod: staging-style validation before release
-	•	Prod: controlled deployment with approval gate
+Readiness Probe
 
-Health checks
+Checks whether the container is ready to serve traffic.
+If it fails, traffic is not routed to the pod.
 
-The application uses Kubernetes probes to improve stability.
+This improves:
+	•	reliability
+	•	deployment safety
+	•	recovery from failures
+	•	production readiness
+________________________________________________________________________
 
-Readiness probe
-
-Determines when the pod is ready to receive traffic.
-
-Liveness probe
-
-Determines when the container should be restarted if it becomes unhealthy.
-
-Example pattern used:
-
-readinessProbe:
-  httpGet:
-    path: /
-    port: 80
-  initialDelaySeconds: 5
-  periodSeconds: 5
-
-livenessProbe:
-  httpGet:
-    path: /
-    port: 80
-  initialDelaySeconds: 15
-  periodSeconds: 10
-
-Terraform modules
-
-This project is structured using reusable Terraform modules.
-
-Included modules
-	•	ACR module: creates Azure Container Registry
-	•	AKS module: creates Azure Kubernetes Service cluster
-	•	Monitoring module: foundation for observability integration
-
-Prerequisites
-
-Before using this project, make sure you have:
-	•	Azure subscription
-	•	Azure CLI installed
-	•	Terraform installed
-	•	Kubectl installed
-	•	Docker installed
-	•	GitHub repository with Actions enabled
-	•	Azure service principal with required permissions
-	•	GitHub secret named AZURE_CREDENTIALS
-
-GitHub secret format
-
-Add the Azure credentials JSON to:
-	•	Settings → Secrets and variables → Actions → New repository secret
-	•	Secret name: AZURE_CREDENTIALS
-
-GitHub Environment setup
-
-Create these environments in GitHub:
-	•	dev
-	•	preprod
-	•	prod
-
-For prod, enable:
-	•	Required reviewers
-	•	optional admin bypass, based on your preference
-
-This makes production deployment pause until approval is granted.
-
-Setup commands
-
-Terraform initialization
-
-terraform init
-terraform plan
-terraform apply
-
-Create namespaces
-
-kubectl create namespace dev
-kubectl create namespace preprod
-kubectl create namespace prod
-
-Apply manifests manually
-
-kubectl apply -f k8s/deployment-dev.yaml
-kubectl apply -f k8s/deployment-preprod.yaml
-kubectl apply -f k8s/deployment-prod.yaml
-
-Verify deployments
+	🛠️ Example Deployment Commands
+	
+```
+kubectl get namespaces
 
 kubectl get pods -n dev
 kubectl get pods -n preprod
@@ -180,96 +172,142 @@ kubectl get svc -n dev
 kubectl get svc -n preprod
 kubectl get svc -n prod
 
-Troubleshooting commands
+kubectl describe pod <pod-name> -n dev
+kubectl describe pod <pod-name> -n preprod
+kubectl describe pod <pod-name> -n prod
 
-kubectl describe pod -n dev <pod-name>
-kubectl logs -n dev <pod-name>
+kubectl logs <pod-name> -n dev
+kubectl logs <pod-name> -n preprod
+kubectl logs <pod-name> -n prod
 
-kubectl describe pod -n preprod <pod-name>
-kubectl logs -n preprod <pod-name>
+kubectl rollout status deployment/myisoapp -n dev
+kubectl rollout status deployment/myisoapp -n preprod
+kubectl rollout status deployment/myisoapp -n prod
+```
 
-kubectl describe pod -n prod <pod-name>
-kubectl logs -n prod <pod-name>
-
-Example workflow file behavior
-
-The GitHub Actions workflow maps branches to environments:
-	•	dev → k8s/deployment-dev.yaml
-	•	preprod → k8s/deployment-preprod.yaml
-	•	main → k8s/deployment-prod.yaml
-
-It tags images using the Git commit SHA and deploys the exact built image.
-
-Screenshots to add
-
-Recommended screenshots for this README:
-	1.	GitHub Actions successful run
-	2.	Dev deployment running in AKS
-	3.	Preprod deployment running in AKS
-	4.	Prod deployment waiting for approval
-	5.	Prod deployment successful after approval
-	6.	GitHub Environments protection rules
-	7.	Kubernetes pods and services output
-	8.	Azure portal view of AKS and ACR
-
-You can place them under a folder such as:
-
-screenshots/
-
-And reference them like:
-
-![GitHub Actions Success](screenshots/github-actions-success.png)
-
-Interview talking points
-
-This project is useful for interviews because it demonstrates:
-	•	Terraform-based AKS provisioning
-	•	modular Infrastructure as Code design
-	•	branch-based deployment strategy
-	•	GitHub Actions CI/CD implementation
-	•	Azure authentication using service principal
-	•	ACR image lifecycle handling
-	•	Kubernetes readiness and liveness probes
-	•	namespace-based environment separation
-	•	production approval gates
-	•	troubleshooting CrashLoopBackOff and deployment issues
-	•	practical DevSecOps structure with OPA policy folders
-
-How to explain this project in an interview
-
-I built an Azure DevSecOps platform project where infrastructure is provisioned with Terraform, container images are built and pushed to Azure Container Registry through GitHub Actions, and deployments are promoted by branch into AKS namespaces for dev, preprod, and prod. I added readiness and liveness probes for reliability and used a GitHub Environment approval gate to protect production deployments.
-
-Key lessons learned
-	•	Do not commit .terraform/ provider binaries to Git
-	•	Ensure Docker build context path is correct, such as ./sample-app
-	•	Namespace-specific deployments must match the intended manifest and namespace
-	•	CrashLoopBackOff often comes from image or startup-command mismatch
-	•	Health probes help validate real application readiness
-	•	Production deployments should have manual approval controls
-
-Future improvements
-	•	Ingress controller and custom domain
-	•	TLS with cert-manager
-	•	Helm or Kustomize for better manifest management
-	•	Prometheus and Grafana integration
-	•	Azure Monitor and Log Analytics dashboards
-	•	OPA or Gatekeeper policy enforcement in deployment stage
-	•	Separate Terraform state/workspaces per environment
-	•	Autoscaling with HPA
-	•	Key Vault integration for secret management
-
-Final status
-
-Current implementation includes:
-	•	AKS deployment pipeline working from GitHub Actions
-	•	dev, preprod, and prod namespaces
-	•	branch-based deployment logic
-	•	production approval gate support
-	•	readiness and liveness probes
-	•	environment-specific Kubernetes manifests
+🧪 What Was Validated in This Project
+	•	Docker image build and push to ACR
+	•	AKS deployment from GitHub Actions
+	•	Branch-based namespace deployment model
+	•	Dev deployment success
+	•	Preprod deployment success
+	•	Prod deployment success
+	•	Production approval gate behavior
+	•	Readiness and liveness probes working
+	•	CrashLoopBackOff troubleshooting and fix
 
 ⸻
 
-Author notes
+🐞 Real Issue Solved During Implementation
 
-This project is designed as a practical portfolio-ready DevSecOps implementation for Azure and Kubernetes learning, demos, and interviews.
+One of the environments failed with CrashLoopBackOff because it was using an older container image tag that expected a different startup behavior.
+
+Root cause
+	•	Wrong image/tag was referenced in deployment manifest
+	•	Container startup command did not match expected runtime
+
+Fix
+	•	Updated the deployment manifest to use the correct image
+	•	Reapplied deployment
+	•	Deleted old failed pods
+	•	Verified healthy pod startup and successful probes
+
+This is actually a strong real-world troubleshooting point for interviews.
+
+⸻
+
+🎯 Why This Project Stands Out
+
+This is not just a simple AKS deployment.
+
+It demonstrates:
+	•	multi-environment deployment strategy
+	•	GitHub Actions workflow design
+	•	namespace-based isolation
+	•	container registry integration
+	•	Kubernetes health checks
+	•	production release governance
+	•	debugging of failed workloads
+	•	practical DevOps thinking
+
+⸻
+
+💼 Interview Talking Points
+
+1. Explain the project in one line
+
+I built a branch-based Azure AKS DevSecOps pipeline where GitHub Actions builds and pushes Docker images to ACR, then deploys them to dev, preprod, and prod namespaces, with manual approval before production release.
+
+2. Key concepts you can discuss confidently
+	•	Terraform module-based design
+	•	AKS and ACR integration
+	•	Docker image tagging with commit SHA
+	•	GitHub Actions workflow logic
+	•	Branch-based deployment strategy
+	•	Namespace isolation
+	•	Liveness and readiness probes
+	•	Approval gate for production
+	•	CrashLoopBackOff troubleshooting
+
+3. Real engineering maturity shown
+	•	separated environments
+	•	controlled production rollout
+	•	health-based deployment validation
+	•	debugging using logs and describe output
+	•	reusable CI/CD design
+
+⸻
+
+🚀 Future Enhancements
+
+This project can be extended further with:
+	•	Helm charts
+	•	Ingress Controller
+	•	TLS/HTTPS
+	•	Azure Monitor integration
+	•	Prometheus + Grafana
+	•	Horizontal Pod Autoscaler
+	•	OPA / Gatekeeper policy enforcement
+	•	ArgoCD / GitOps
+	•	Separate Terraform state per environment
+	•	Blue/Green or Canary deployments
+
+⸻
+## 🏁 Final Outcome
+
+✅ Infrastructure provisioned with Terraform  
+✅ Docker image built and pushed to ACR  
+✅ AKS deployments working across environments  
+✅ Dev, preprod, and prod namespaces configured  
+✅ GitHub Actions branch-based pipeline implemented  
+✅ Production approval gate configured  
+✅ Readiness and liveness probes added  
+✅ Enterprise-style deployment model demonstrated  
+⸻
+
+## 👨‍💻 Author
+
+**Sudhir Dalvi**
+
+Built as a hands-on Azure DevSecOps project to demonstrate practical skills in:
+
+- Terraform
+- Azure AKS
+- Azure Container Registry (ACR)
+- GitHub Actions
+- Kubernetes
+- Multi-environment deployment design
+
+---
+
+## ⭐ If You Like This Project
+
+Give it a star and use it as a reference for:
+
+- DevOps portfolio
+- Interview discussions
+- AKS learning
+- GitHub Actions practice
+- Enterprise CI/CD design
+
+
