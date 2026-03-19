@@ -130,43 +130,45 @@ azure-aks-devsecops-pipeline/
 └── README.md
 ```
 
-☸️ Kubernetes Highlights
+## ☸️ Kubernetes Highlights
 
 This project uses separate Kubernetes manifests for each environment.
 
-Key features included:
-	•	Namespace-based environment isolation
-	•	Service exposure using Kubernetes Service
-	•	Liveness probe for container health validation
-	•	Readiness probe for traffic readiness
-	•	Branch-specific deployment manifests
+### Key features included
 
-⸻
+- Namespace-based environment isolation
+- Service exposure using Kubernetes Services
+- Liveness probe for container health validation
+- Readiness probe for traffic readiness
+- Branch-specific deployment manifests
 
-❤️ Health Checks Implemented
 
-Health checks are extremely important in AKS and interviews.
+## ❤️ Health Checks Implemented
 
-Liveness Probe
+Health checks are a critical part of Kubernetes reliability and a very common interview topic.
 
-Checks whether the container is alive.
+### Liveness Probe
+
+Checks whether the container is still alive.  
 If it fails repeatedly, Kubernetes restarts the container.
 
-Readiness Probe
+### Readiness Probe
 
-Checks whether the container is ready to serve traffic.
-If it fails, traffic is not routed to the pod.
+Checks whether the container is ready to receive traffic.  
+If it fails, Kubernetes stops sending traffic to that pod.
 
-This improves:
-	•	reliability
-	•	deployment safety
-	•	recovery from failures
-	•	production readiness
+### Why this matters
+
+- Improves application reliability
+- Prevents broken pods from receiving traffic
+- Helps with safer deployments
+- Supports automatic recovery
+- Makes the setup more production-ready
 ________________________________________________________________________
 
-	🛠️ Example Deployment Commands
-	
-```
+## 🛠️ Example Deployment Commands
+
+```bash
 kubectl get namespaces
 
 kubectl get pods -n dev
@@ -190,35 +192,40 @@ kubectl rollout status deployment/myisoapp -n preprod
 kubectl rollout status deployment/myisoapp -n prod
 ```
 
-🧪 What Was Validated in This Project
-	•	Docker image build and push to ACR
-	•	AKS deployment from GitHub Actions
-	•	Branch-based namespace deployment model
-	•	Dev deployment success
-	•	Preprod deployment success
-	•	Prod deployment success
-	•	Production approval gate behavior
-	•	Readiness and liveness probes working
-	•	CrashLoopBackOff troubleshooting and fix
+## 🧪 What Was Validated in This Project
 
+- Docker image build and push to ACR
+- AKS deployment from GitHub Actions
+- Branch-based namespace deployment model
+- Dev deployment success
+- Preprod deployment success
+- Prod deployment success
+- Production approval gate behavior
+- Readiness and liveness probes working
+- CrashLoopBackOff troubleshooting and fix
 ⸻
 
-🐞 Real Issue Solved During Implementation
+## 🐞 Real Issue Solved During Implementation
 
-One of the environments failed with CrashLoopBackOff because it was using an older container image tag that expected a different startup behavior.
+During implementation, one of the main issues encountered was:
 
-Root cause
-	•	Wrong image/tag was referenced in deployment manifest
-	•	Container startup command did not match expected runtime
+- `CrashLoopBackOff` in AKS pods
 
-Fix
-	•	Updated the deployment manifest to use the correct image
-	•	Reapplied deployment
-	•	Deleted old failed pods
-	•	Verified healthy pod startup and successful probes
+### Root cause
 
-This is actually a strong real-world troubleshooting point for interviews.
+The issue was caused by using an incorrect container startup configuration and an image/runtime mismatch during earlier deployment attempts.
 
+### How it was fixed
+
+- Rebuilt the Docker image correctly
+- Updated the deployment to use the correct working application image
+- Verified logs using `kubectl logs`
+- Verified pod details using `kubectl describe pod`
+- Redeployed and confirmed pod health
+
+### Outcome
+
+After the fix, the application was deployed successfully and the pods reached the `Running` state across the target environment.
 ⸻
 
 🎯 Why This Project Stands Out
