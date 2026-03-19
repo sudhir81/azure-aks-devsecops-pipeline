@@ -105,8 +105,10 @@ Before deployment to `prod`:
 
 This simulates a real enterprise release control process and adds an important safety layer before production changes go live.
 
-```
-Azure-aks-devsecops-pipeline/
+## 📁 Project Structure
+
+```text
+azure-aks-devsecops-pipeline/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml
@@ -127,6 +129,7 @@ Azure-aks-devsecops-pipeline/
 ├── variables.tf
 └── README.md
 ```
+
 ☸️ Kubernetes Highlights
 
 This project uses separate Kubernetes manifests for each environment.
