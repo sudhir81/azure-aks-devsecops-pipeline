@@ -230,60 +230,50 @@ It demonstrates:
 	•	debugging of failed workloads
 	•	practical DevOps thinking
 
-⸻
+⸻## 💼 Interview Talking Points
 
-💼 Interview Talking Points
+### Explain the project in one line
 
-1. Explain the project in one line
+I built a branch-based Azure AKS DevSecOps pipeline where GitHub Actions builds and pushes Docker images to Azure Container Registry (ACR), then deploys them to dev, preprod, and prod Kubernetes namespaces, with manual approval before production release.
 
-I built a branch-based Azure AKS DevSecOps pipeline where GitHub Actions builds and pushes Docker images to ACR, then deploys them to dev, preprod, and prod namespaces, with manual approval before production release.
+### Key concepts you can discuss confidently
 
-2. Key concepts you can discuss confidently
-	•	Terraform module-based design
-	•	AKS and ACR integration
-	•	Docker image tagging with commit SHA
-	•	GitHub Actions workflow logic
-	•	Branch-based deployment strategy
-	•	Namespace isolation
-	•	Liveness and readiness probes
-	•	Approval gate for production
-	•	CrashLoopBackOff troubleshooting
+- Terraform module-based design
+- AKS and ACR integration
+- Docker image tagging with commit SHA
+- GitHub Actions workflow logic
+- Branch-based deployment strategy
+- Namespace isolation
+- Liveness and readiness probes
+- Approval gate for production
+- CrashLoopBackOff troubleshooting
 
-3. Real engineering maturity shown
-	•	separated environments
-	•	controlled production rollout
-	•	health-based deployment validation
-	•	debugging using logs and describe output
-	•	reusable CI/CD design
+### Real engineering maturity shown
 
-⸻
+- Separated environments
+- Controlled production rollout
+- Health-based deployment validation
+- Debugging using `kubectl logs` and `kubectl describe`
+- Reusable CI/CD design
 
-🚀 Future Enhancements
+---
+
+## 🚀 Future Enhancements
 
 This project can be extended further with:
-	•	Helm charts
-	•	Ingress Controller
-	•	TLS/HTTPS
-	•	Azure Monitor integration
-	•	Prometheus + Grafana
-	•	Horizontal Pod Autoscaler
-	•	OPA / Gatekeeper policy enforcement
-	•	ArgoCD / GitOps
-	•	Separate Terraform state per environment
-	•	Blue/Green or Canary deployments
 
-⸻
-## 🏁 Final Outcome
+- Helm charts
+- Ingress Controller
+- TLS / HTTPS
+- Azure Monitor integration
+- Prometheus + Grafana
+- Horizontal Pod Autoscaler
+- OPA / Gatekeeper policy enforcement
+- ArgoCD / GitOps
+- Separate Terraform state per environment
+- Blue/Green or Canary deployments
 
-✅ Infrastructure provisioned with Terraform  
-✅ Docker image built and pushed to ACR  
-✅ AKS deployments working across environments  
-✅ Dev, preprod, and prod namespaces configured  
-✅ GitHub Actions branch-based pipeline implemented  
-✅ Production approval gate configured  
-✅ Readiness and liveness probes added  
-✅ Enterprise-style deployment model demonstrated  
-⸻
+---
 
 ## 👨‍💻 Author
 
