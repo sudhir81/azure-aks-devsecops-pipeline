@@ -71,6 +71,8 @@ jobs:
     if: github.ref_name == 'dev' || github.ref_name == 'preprod'
     needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ needs.build.outputs.environment_name }}
 
     steps:
       - name: Checkout code
@@ -90,7 +92,7 @@ jobs:
 
       - name: Deploy to AKS
         run: |
-          kubectl apply -f ${{ needs.build.outputs.deploy_file }}
+          kubectl apply -n ${{ needs.build.outputs.namespace }} -f ${{ needs.build.outputs.deploy_file }}
           kubectl rollout status deployment/myisoapp -n ${{ needs.build.outputs.namespace }}
 
   deploy-prod:
@@ -118,5 +120,5 @@ jobs:
 
       - name: Deploy to AKS
         run: |
-          kubectl apply -f ${{ needs.build.outputs.deploy_file }}
+          kubectl apply -n prod -f ${{ needs.build.outputs.deploy_file }}
           kubectl rollout status deployment/myisoapp -n prod
