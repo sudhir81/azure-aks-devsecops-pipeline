@@ -50,20 +50,20 @@ Developer Push
 ```
 ## ⚙️ Tech Stack
 
-| **Layer** | **Technology** |
+| Layer | Technology |
 |---|---|
-| **Cloud** | Microsoft Azure |
-| **IaC** | Terraform |
-| **Containerization** | Docker |
-| **Registry** | Azure Container Registry (ACR) |
-| **Orchestration** | Azure Kubernetes Service (AKS) |
-| **CI/CD** | GitHub Actions |
-| **Deployment Strategy** | Branch-based deployment |
-| **Environments** | dev, preprod, prod |
-| **Health Checks** | Liveness Probe, Readiness Probe |
-| **Security Control** | GitHub Environment Approval Gate |
-
+| Cloud | Microsoft Azure |
+| IaC | Terraform |
+| Containerization | Docker |
+| Registry | Azure Container Registry (ACR) |
+| Orchestration | Azure Kubernetes Service (AKS) |
+| CI/CD | GitHub Actions |
+| Deployment Strategy | Branch-based deployment |
+| Environments | dev, preprod, prod |
+| Health Checks | Liveness Probe, Readiness Probe |
+| Security Control | GitHub Environment Approval Gate |
 ## 🌍 Environment Mapping
+
 
 | **Git Branch** | **Kubernetes Namespace** | **Deployment Target** |
 |---|---|---|
