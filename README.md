@@ -49,7 +49,6 @@ Developer Push
        └── Manual approval required
            └── Deploy to prod namespace
 ```
-
 ## ⚙️ Tech Stack
 
 | Layer | Technology |
@@ -72,7 +71,6 @@ Developer Push
 | `dev` | `dev` | Development |
 | `preprod` | `preprod` | Pre-Production |
 | `main` | `prod` | Production |
-
 
 ## 🔄 CI/CD Workflow Logic
 
@@ -242,7 +240,6 @@ This project can be extended further with:
 - ArgoCD / GitOps
 - Separate Terraform state per environment
 - Blue/Green or Canary deployments
-
 ---
 
 ## 👨‍💻 Author
