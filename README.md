@@ -73,25 +73,26 @@ if GitHub breaks because of nested triple backticks while you paste into chat or
 | `preprod` | `preprod` | Pre-Production |
 | `main` | `prod` | Production |
 
-🔄 CI/CD Workflow Logic
 
-✅ Build Stage
+## 🔄 CI/CD Workflow Logic
 
-When code is pushed to dev, preprod, or main:
-	•	Source code is checked out
-	•	Azure login is performed
-	•	Docker image is built
-	•	Image is tagged with the Git commit SHA
-	•	Image is pushed to ACR
+### ✅ Build Stage
 
-✅ Deploy Stage
+When code is pushed to `dev`, `preprod`, or `main`:
+
+- Source code is checked out
+- Azure login is performed
+- Docker image is built
+- Image is tagged with the Git commit SHA
+- Image is pushed to ACR
+
+### ✅ Deploy Stage
 
 Based on the branch:
-	•	dev → deploys to dev namespace
-	•	preprod → deploys to preprod namespace
-	•	main → deploys to prod namespace only after manual approval
 
-⸻
+- `dev` → deploys to `dev` namespace
+- `preprod` → deploys to `preprod` namespace
+- `main` → deploys to `prod` namespace only after manual approval
 
 🔐 Production Approval Gate
 
