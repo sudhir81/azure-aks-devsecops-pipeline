@@ -93,17 +93,17 @@ Based on the branch:
 - `dev` → deploys to `dev` namespace
 - `preprod` → deploys to `preprod` namespace
 - `main` → deploys to `prod` namespace only after manual approval
+## 🔐 Production Approval Gate
 
-🔐 Production Approval Gate
+Production deployment is protected using **GitHub Environments**.
 
-Production deployment is protected using GitHub Environments.
+Before deployment to `prod`:
 
-Before deployment to prod:
-	•	Workflow waits for approval
-	•	Reviewer manually approves deployment
-	•	Only then deployment continues to production
+- The workflow waits for manual approval
+- An authorized reviewer approves the deployment
+- Only then the workflow continues to the `prod` namespace
 
-This simulates a real enterprise release control process.
+This simulates a real enterprise release control process and adds an important safety layer before production changes go live.
 
 ```
 Azure-aks-devsecops-pipeline/
